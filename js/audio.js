@@ -161,7 +161,7 @@ export class EngineAudio {
 
     this.highpass = ctx.createBiquadFilter();
     this.highpass.type = "highpass";
-    this.highpass.frequency.value = 150;
+    this.highpass.frequency.value = 220;
     this.highpass.Q.value = 0.7;
 
     this.oscGain = ctx.createGain();
@@ -246,9 +246,10 @@ export class EngineAudio {
       return;
     }
 
-    // Firing frequency: once per revolution. RPM 2200 -> ~37Hz idle putter,
-    // RPM 32000 -> ~533Hz full-throttle whine.
-    const freq = rpm / 60;
+    // Firing frequency: once per revolution, pitched up ~30% from the
+    // literal firing rate for a brighter, less bassy note. RPM 2200 ->
+    // ~48Hz idle putter, RPM 32000 -> ~693Hz full-throttle whine.
+    const freq = (rpm / 60) * 1.3;
     const leanness = Math.max(0, -mixDev);
     const richness = Math.max(0, mixDev);
 
