@@ -17,9 +17,22 @@ HTML/CSS/JS, no build step, no dependencies).
 
 Needles are adjusted in "clock hours" (12 hours = one full turn).
 Counter-clockwise richens, clockwise leans — matching real needle-valve
-convention. The step selector lets you choose 1 hour, a quarter turn, a
-half turn, or a full turn per tap of the +/- buttons, and each tap shows
-exactly how much and which direction you just turned.
+convention. The step selector lets you choose 1/4 hour, 1/2 hour, or
+1 hour per tap of the +/- buttons, and each tap shows exactly how much
+and which direction you just turned.
+
+## Weather, not random mistuning
+
+The needles always start at the same factory-baseline position each
+session. What changes is the weather: a randomized track temperature and
+humidity (shown in the "Track Conditions" bar, since that's information a
+real tuner would actually have) shift the *hidden* correct needle
+position. Hot/humid air is less dense, so the engine ingests less oxygen
+per revolution — the same needle setting ends up running effectively
+richer and needs leaning to compensate. Cold/dry air is denser, so the
+same needle setting runs effectively leaner and can take a touch more
+fuel. This mirrors why real pit crews re-check their tune through the day
+as conditions change, rather than the needles themselves having moved.
 
 The simulation drives RPM, head temperature, exhaust smoke, and a
 synthesized engine note (Web Audio) from the needle positions and

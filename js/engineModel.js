@@ -7,29 +7,53 @@
 // A mechanical idle screw sets idle RPM but doesn't change the mixture.
 //
 // "Optimal" needle positions are hidden from the player by default (like a
-// real engine, you tune by ear/smoke/heat, not a readout) and are randomized
-// per session within realistic ranges so the same car doesn't always tune
-// the same way.
+// real engine, you tune by ear/smoke/heat, not a readout). The needles
+// themselves always start at the same factory-baseline position; what
+// actually moves session to session is the weather. Air density - driven by
+// temperature and humidity - changes how much oxygen mass the engine ingests
+// for the same needle opening: hot/humid (less dense) air means less oxygen
+// per revolution, so a given needle position runs effectively richer and
+// must be leaned slightly to compensate; cold/dry (denser) air means more
+// oxygen, so the same needle position runs effectively leaner and can take
+// a touch more fuel. That's why real pit crews re-check their tune through
+// the day as the weather changes, rather than mistuning the needles
+// themselves between runs.
 
 export class EngineModel {
   constructor(rng = Math.random) {
     this.rng = rng;
 
-    // Hidden "correct" needle positions, in hours-open-from-fully-closed.
-    this.hsnOptimal = 26 + rng() * 10; // ~2.2 - 3.0 turns out
-    this.lsnOptimal = 8 + rng() * 6; // ~0.7 - 1.2 turns out
+    // Today's weather (known to the player, like a real track day).
+    this.ambientF = 55 + rng() * 55; // 55-110F
+    this.humidityPct = 10 + rng() * 85; // 10-95%
 
-    // Player-controlled state. Like a real car, we start from close to the
-    // factory baseline rather than wildly mistuned - a couple of clicks off,
-    // not several turns - so an idle stall means *you* leaned it there, not
-    // that the random start happened to be unreasonable.
-    this.hsnHours = this.hsnOptimal + (rng() * 6 - 3); // start mistuned +/-3hr
-    this.lsnHours = this.lsnOptimal + (rng() * 3 - 1.5); // +/-1.5hr
+    // Factory-baseline needle positions, in hours-open-from-fully-closed.
+    // These never change - only the hidden optimal (below) moves with the
+    // weather, so the same starting point tunes differently each session.
+    this.hsnBaseline = 30; // 2.5 turns out
+    this.lsnBaseline = 10; // ~0.83 turns out
+
+    // Reference conditions the baseline settings assume (a mild, "average"
+    // day). Deviating from this in the hot/humid direction effectively
+    // richens a fixed needle setting; the cold/dry direction leans it.
+    const refF = 75;
+    const refHumidity = 50;
+    const ambientShiftHours =
+      (this.ambientF - refF) * 0.12 + (this.humidityPct - refHumidity) * 0.035;
+
+    // Hidden "correct" needle positions for today's air. Hotter/more humid
+    // air shifts the true optimum leaner (lower hours); colder/drier air
+    // shifts it richer (higher hours).
+    this.hsnOptimal = this.hsnBaseline - ambientShiftHours;
+    this.lsnOptimal = this.lsnBaseline - ambientShiftHours * 0.4;
+
+    // Player-controlled state: always the same factory baseline to start.
+    this.hsnHours = this.hsnBaseline;
+    this.lsnHours = this.lsnBaseline;
     this.idleScrew = 50; // 0-100, mechanical idle-speed stop
     this.throttle = 0; // 0-100
 
     this.running = false;
-    this.ambientF = 75;
 
     // Simulated physical state.
     this.rpm = 0;

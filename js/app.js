@@ -32,6 +32,12 @@ unitToggle.addEventListener("click", () => {
   unitToggle.textContent = `°${tempUnit}`;
 });
 
+function fmtTemp(fahrenheit) {
+  return tempUnit === "F"
+    ? `${Math.round(fahrenheit)}°F`
+    : `${Math.round(((fahrenheit - 32) * 5) / 9)}°C`;
+}
+
 // ---------- Throttle ----------
 throttleSlider.addEventListener("input", () => {
   model.setThrottle(Number(throttleSlider.value));
@@ -262,9 +268,10 @@ function frame(now) {
   const tempFrac = (model.tempF - 70) / (300 - 70);
   const tempColor = model.tempF > 270 ? "#ff4d4f" : model.tempF > 250 ? "#f5c542" : "#3fa9f5";
   drawDial(tempCanvas, tempFrac, tempColor);
-  const tempDisplay =
-    tempUnit === "F" ? `${Math.round(model.tempF)}°F` : `${Math.round((model.tempF - 32) * 5 / 9)}°C`;
-  el("#tempValue").textContent = tempDisplay;
+  el("#tempValue").textContent = fmtTemp(model.tempF);
+
+  el("#conditionTemp").textContent = fmtTemp(model.ambientF);
+  el("#conditionHumidity").textContent = `${Math.round(model.humidityPct)}%`;
 
   smokePuff.style.height = `${10 + model.smoke * 0.5}%`;
   smokePuff.style.opacity = String(0.1 + model.smoke / 130);
