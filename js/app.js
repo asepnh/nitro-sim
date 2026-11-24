@@ -270,7 +270,9 @@ function frame(now) {
   drawDial(tempCanvas, tempFrac, tempColor);
   el("#tempValue").textContent = fmtTemp(model.tempF);
 
-  el("#conditionTemp").textContent = fmtTemp(model.ambientF);
+  // Track conditions always read in Celsius, independent of the head-temp
+  // gauge's unit toggle.
+  el("#conditionTemp").textContent = `${Math.round(((model.ambientF - 32) * 5) / 9)}°C`;
   el("#conditionHumidity").textContent = `${Math.round(model.humidityPct)}%`;
 
   smokePuff.style.height = `${10 + model.smoke * 0.5}%`;
