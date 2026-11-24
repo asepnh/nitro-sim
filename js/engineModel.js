@@ -9,15 +9,23 @@
 // "Optimal" needle positions are hidden from the player by default (like a
 // real engine, you tune by ear/smoke/heat, not a readout). The needles
 // themselves always start at the same factory-baseline position; what
-// actually moves session to session is the weather. Air density - driven by
-// temperature and humidity - changes how much oxygen mass the engine ingests
-// for the same needle opening: hot/humid (less dense) air means less oxygen
-// per revolution, so a given needle position runs effectively richer and
-// must be leaned slightly to compensate; cold/dry (denser) air means more
-// oxygen, so the same needle position runs effectively leaner and can take
-// a touch more fuel. That's why real pit crews re-check their tune through
-// the day as the weather changes, rather than mistuning the needles
-// themselves between runs.
+// actually moves them is weather and fuel.
+//
+// Air density - driven by temperature and humidity - changes how much
+// oxygen mass the engine ingests for the same needle opening: hot/humid
+// (less dense) air means less oxygen per revolution, so a given needle
+// position runs effectively richer and must be leaned slightly to
+// compensate; cold/dry (denser) air means more oxygen, so the same needle
+// position runs effectively leaner and can take a touch more fuel. That's
+// why real pit crews re-check their tune through the day as the weather
+// changes, rather than mistuning the needles themselves between runs.
+//
+// Nitromethane content works the other way: it carries its own oxygen in
+// the molecule and burns hotter, so higher-nitro fuel needs the needles
+// richened compared to lower-nitro fuel on the same engine, partly for
+// the different combustion chemistry and partly for extra heat margin.
+// Switching fuel mid-session (at the pits, engine off) is realistic;
+// swapping it while running isn't, so that's locked out.
 
 export class EngineModel {
   constructor(rng = Math.random) {
@@ -28,24 +36,27 @@ export class EngineModel {
     this.humidityPct = 10 + rng() * 85; // 10-95%
 
     // Factory-baseline needle positions, in hours-open-from-fully-closed.
-    // These never change - only the hidden optimal (below) moves with the
-    // weather, so the same starting point tunes differently each session.
+    // These never change - only the hidden optimal (below) moves with
+    // weather/fuel, so the same starting point tunes differently each time.
     this.hsnBaseline = 30; // 2.5 turns out
     this.lsnBaseline = 10; // ~0.83 turns out
 
     // Reference conditions the baseline settings assume (a mild, "average"
     // day). Deviating from this in the hot/humid direction effectively
-    // richens a fixed needle setting; the cold/dry direction leans it.
+    // richens a fixed needle setting; the cold/dry direction leans it. This
+    // is fixed for the whole session - only a reset re-rolls the weather.
     const refF = 75;
     const refHumidity = 50;
-    const ambientShiftHours =
+    this.weatherShiftHours =
       (this.ambientF - refF) * 0.12 + (this.humidityPct - refHumidity) * 0.035;
 
-    // Hidden "correct" needle positions for today's air. Hotter/more humid
-    // air shifts the true optimum leaner (lower hours); colder/drier air
-    // shifts it richer (higher hours).
-    this.hsnOptimal = this.hsnBaseline - ambientShiftHours;
-    this.lsnOptimal = this.lsnBaseline - ambientShiftHours * 0.4;
+    // Fuel nitro percentage the player can change between runs (engine
+    // stopped). Reference is 20%, a common mid-strength RC fuel.
+    this.nitroPct = 20;
+    this.refNitroPct = 20;
+    this.fuelSensitivity = 0.3; // hours of needle shift per % nitro
+
+    this.recomputeOptimal();
 
     // Player-controlled state: always the same factory baseline to start.
     this.hsnHours = this.hsnBaseline;
@@ -72,7 +83,11 @@ export class EngineModel {
     this.lastThrottle = 0;
 
     // Rolling "tune quality" telemetry used by the status checklist.
-    this.history = {
+    this.history = this.freshHistory();
+  }
+
+  freshHistory() {
+    return {
       idleStableTime: 0,
       idleStallEvents: 0,
       transitionBogEvents: 0,
@@ -83,6 +98,28 @@ export class EngineModel {
       topEndSmokeHeavyTime: 0,
       topEndSmokeNoneTime: 0,
     };
+  }
+
+  // Recomputes the hidden optimal needle positions from the fixed
+  // per-session weather shift plus the current fuel's shift. Called once at
+  // construction and again whenever the fuel is changed (needle positions
+  // and weather are left untouched).
+  recomputeOptimal() {
+    const fuelShiftHours =
+      (this.refNitroPct - this.nitroPct) * this.fuelSensitivity;
+    const totalShift = this.weatherShiftHours + fuelShiftHours;
+    this.hsnOptimal = this.hsnBaseline - totalShift;
+    this.lsnOptimal = this.lsnBaseline - totalShift * 0.4;
+  }
+
+  // Changing fuel means a pit stop in reality, so it's only allowed with the
+  // engine stopped. Returns true if the change was applied.
+  setFuel(nitroPct) {
+    if (this.running) return false;
+    this.nitroPct = nitroPct;
+    this.recomputeOptimal();
+    this.history = this.freshHistory();
+    return true;
   }
 
   clampNeedles() {
@@ -164,7 +201,8 @@ export class EngineModel {
 
     // --- RPM / power model -------------------------------------------------
     const idleBaseRpm = 2200 + (this.idleScrew - 50) * 30; // mechanical stop
-    const maxRpm = 32000;
+    // Higher nitro content makes more power, raising the achievable ceiling.
+    const maxRpm = 32000 + (this.nitroPct - this.refNitroPct) * 120;
     let powerFactor;
     if (mixDev >= 0) {
       // Rich: fuel-fouled, sluggish, bogs harder the richer it gets.
@@ -230,7 +268,9 @@ export class EngineModel {
     }
 
     // --- Temperature model ---------------------------------------------
-    const loadHeat = 55 * throttleFrac * (0.5 + 0.5 * this.warmup);
+    // Higher nitro content burns hotter even at the same mixture.
+    const nitroHeat = (this.nitroPct - this.refNitroPct) * 0.6;
+    const loadHeat = 55 * throttleFrac * (0.5 + 0.5 * this.warmup) + nitroHeat * throttleFrac;
     let mixHeat;
     if (mixDev >= 0) {
       mixHeat = -Math.min(35, mixDev * 3); // richer runs cooler

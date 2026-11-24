@@ -34,6 +34,19 @@ same needle setting runs effectively leaner and can take a touch more
 fuel. This mirrors why real pit crews re-check their tune through the day
 as conditions change, rather than the needles themselves having moved.
 
+## Fuel nitro percentage
+
+A "Fuel" selector (10/20/25/30%) lets you change the nitromethane
+content between runs. Nitromethane carries its own oxygen in the
+molecule and burns hotter, so higher-nitro fuel needs the needles
+richened compared to lower-nitro fuel on the same engine - both for the
+different combustion chemistry and for extra heat margin. Higher nitro
+also raises the achievable RPM ceiling and runs a bit hotter at the same
+mixture. Weather is unaffected by a fuel change (it's fixed per session);
+only the hidden optimal needle position shifts. Changing fuel is locked
+out while the engine is running, matching real life - you shut down and
+re-tune, you don't swap fuel chemistry mid-run.
+
 The simulation drives RPM, head temperature, exhaust smoke, and a
 synthesized engine note (Web Audio) from the needle positions and
 throttle, modeling real symptoms:

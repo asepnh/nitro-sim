@@ -25,6 +25,7 @@
     </ol>
     <p class="hint">Adjustments are made in "clock hours" &mdash; 12 hours = one full turn of the needle. Counter-clockwise (CCW) richens, clockwise (CW) leans.</p>
     <p class="hint">The needles always start at the same factory baseline. What changes each session is the weather: hot/humid air is less dense (less oxygen per revolution), so a fixed needle setting runs effectively richer and needs leaning; cold/dry air is denser and needs a touch more fuel.</p>
+    <p class="hint">Fuel matters too: higher nitro content burns hotter and needs the needles richened compared to lower nitro on the same engine. Change fuel only with the engine stopped &mdash; it's a pit-stop decision, not something you adjust on the fly.</p>
   </section>
 
   <main class="layout">
@@ -37,6 +38,17 @@
         <span class="condition-label">Humidity</span>
         <span class="condition-value" id="conditionHumidity">--%</span>
       </div>
+    </section>
+
+    <section class="fuel-section">
+      <h2>Fuel (Nitro %)</h2>
+      <div class="fuel-presets">
+        <button data-nitro="10">10%</button>
+        <button data-nitro="20" class="active">20%</button>
+        <button data-nitro="25">25%</button>
+        <button data-nitro="30">30%</button>
+      </div>
+      <p class="fuel-hint" id="fuelHint">Higher nitro burns hotter and needs a richer tune. Stop the engine to change fuel.</p>
     </section>
 
     <section class="gauges">

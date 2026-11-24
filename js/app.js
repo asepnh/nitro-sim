@@ -50,6 +50,25 @@ function updateThrottlePresetHighlight() {
   });
 }
 
+// ---------- Fuel ----------
+const fuelHint = el("#fuelHint");
+document.querySelectorAll(".fuel-presets button").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (model.setFuel(Number(btn.dataset.nitro))) {
+      updateFuelDisplay();
+    }
+  });
+});
+function updateFuelDisplay() {
+  document.querySelectorAll(".fuel-presets button").forEach((b) => {
+    b.classList.toggle("active", Number(b.dataset.nitro) === model.nitroPct);
+    b.disabled = model.running;
+  });
+  fuelHint.textContent = model.running
+    ? "Stop the engine to change fuel."
+    : "Higher nitro burns hotter and needs a richer tune.";
+}
+
 // ---------- Start/stop/reset ----------
 startStopBtn.addEventListener("click", () => {
   if (model.running) {
@@ -73,6 +92,7 @@ resetBtn.addEventListener("click", () => {
 function updateRunButton() {
   startStopBtn.textContent = model.running ? "Stop Engine" : "Start Engine";
   startStopBtn.classList.toggle("running", model.running);
+  updateFuelDisplay();
 }
 
 // ---------- Needle controls ----------

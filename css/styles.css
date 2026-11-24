@@ -207,6 +207,40 @@ h1, h2 { margin: 0; }
   border-color: var(--accent);
 }
 
+.fuel-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.fuel-section h2 { font-size: 0.95rem; margin-bottom: 0.6rem; }
+.fuel-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+}
+.fuel-presets button {
+  min-height: 42px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+.fuel-presets button.active {
+  background: var(--rich);
+  color: #001b2a;
+  border-color: var(--rich);
+}
+.fuel-presets button:disabled {
+  opacity: 0.45;
+}
+.fuel-hint {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
 .needles {
   display: flex;
   flex-direction: column;
