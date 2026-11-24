@@ -52,6 +52,9 @@ export class EngineModel {
       topEndTime: 0,
       topEndGoodTime: 0,
       topEndOverheatTime: 0,
+      topEndSmokeGoodTime: 0,
+      topEndSmokeHeavyTime: 0,
+      topEndSmokeNoneTime: 0,
     };
   }
 
@@ -240,10 +243,19 @@ export class EngineModel {
     }
 
     // --- Smoke -----------------------------------------------------------
-    let targetSmoke = 10 + Math.max(0, mixDev) * 7 - throttleFrac * 8;
-    if (mixDev < -1) targetSmoke -= 6; // lean = thin/no smoke
+    // A correctly tuned engine still trails a thin wisp of smoke at full
+    // throttle, not none - "none" means you've already gone past peak into
+    // lean territory, which is exactly the trap the tuning guide warns about.
+    let targetSmoke = 15 + Math.max(0, mixDev) * 7 - throttleFrac * 5;
+    if (mixDev < -1) targetSmoke -= 8; // lean of peak = thin/no smoke
     targetSmoke = Math.max(0, Math.min(100, targetSmoke));
     this.smoke += (targetSmoke - this.smoke) * Math.min(1, dt * 1.5);
+
+    if (throttleFrac > 0.6) {
+      if (this.smoke >= 5 && this.smoke <= 35) this.history.topEndSmokeGoodTime += dt;
+      if (this.smoke > 50) this.history.topEndSmokeHeavyTime += dt;
+      if (this.smoke < 3) this.history.topEndSmokeNoneTime += dt;
+    }
 
     this.lastThrottle = this.throttle;
   }
@@ -274,7 +286,12 @@ export class EngineModel {
       h.topEndTime > 3 && h.topEndOverheatTime / Math.max(1, h.topEndTime) < 0.1;
     const powerOk =
       h.topEndGoodTime > 3 && Math.abs(this.hsnDeviation) < 2.5;
+    const smokeOk =
+      h.topEndTime > 3 &&
+      h.topEndSmokeGoodTime / Math.max(1, h.topEndTime) > 0.5 &&
+      h.topEndSmokeHeavyTime / Math.max(1, h.topEndTime) < 0.2 &&
+      h.topEndSmokeNoneTime / Math.max(1, h.topEndTime) < 0.2;
 
-    return { idleOk, transitionOk, tempOk, powerOk };
+    return { idleOk, transitionOk, tempOk, powerOk, smokeOk };
   }
 }

@@ -65,15 +65,7 @@ startStopBtn.addEventListener("click", () => {
 
 resetBtn.addEventListener("click", () => {
   audio.stop();
-  model.reset();
-  model.history = {
-    idleStableTime: 0,
-    idleStallEvents: 0,
-    transitionBogEvents: 0,
-    topEndTime: 0,
-    topEndGoodTime: 0,
-    topEndOverheatTime: 0,
-  };
+  model.reset(); // rebuilds history (and everything else) via the constructor
   throttleSlider.value = "0";
   updateThrottlePresetHighlight();
   updateRunButton();
@@ -210,6 +202,7 @@ const statusItems = {
   transition: el("#status-transition"),
   temp: el("#status-temp"),
   power: el("#status-power"),
+  smoke: el("#status-smoke"),
 };
 
 function updateChecklist() {
@@ -221,6 +214,12 @@ function updateChecklist() {
   statusItems.temp.classList.toggle("ok", s.tempOk);
   statusItems.temp.classList.toggle("bad", !s.tempOk && model.history.topEndOverheatTime > 1);
   statusItems.power.classList.toggle("ok", s.powerOk);
+  statusItems.smoke.classList.toggle("ok", s.smokeOk);
+  statusItems.smoke.classList.toggle(
+    "bad",
+    !s.smokeOk &&
+      (model.history.topEndSmokeHeavyTime > 1 || model.history.topEndSmokeNoneTime > 1)
+  );
 }
 
 // ---------- Status banner ----------
