@@ -4,7 +4,7 @@ import { EngineAudio } from "./audio.js";
 const model = new EngineModel();
 const audio = new EngineAudio();
 
-let tempUnit = "F";
+let tempUnit = "C";
 let selectedStep = { hsn: 1, lsn: 1, idle: 1 };
 
 // ---------- DOM refs ----------
