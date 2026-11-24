@@ -19,9 +19,12 @@ export class EngineModel {
     this.hsnOptimal = 26 + rng() * 10; // ~2.2 - 3.0 turns out
     this.lsnOptimal = 8 + rng() * 6; // ~0.7 - 1.2 turns out
 
-    // Player-controlled state.
-    this.hsnHours = this.hsnOptimal + (rng() * 10 - 5); // start mistuned
-    this.lsnHours = this.lsnOptimal + (rng() * 6 - 3);
+    // Player-controlled state. Like a real car, we start from close to the
+    // factory baseline rather than wildly mistuned - a couple of clicks off,
+    // not several turns - so an idle stall means *you* leaned it there, not
+    // that the random start happened to be unreasonable.
+    this.hsnHours = this.hsnOptimal + (rng() * 6 - 3); // start mistuned +/-3hr
+    this.lsnHours = this.lsnOptimal + (rng() * 3 - 1.5); // +/-1.5hr
     this.idleScrew = 50; // 0-100, mechanical idle-speed stop
     this.throttle = 0; // 0-100
 
