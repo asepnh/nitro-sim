@@ -216,7 +216,7 @@ h1, h2 { margin: 0; }
 .fuel-section h2 { font-size: 0.95rem; margin-bottom: 0.6rem; }
 .fuel-presets {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.4rem;
 }
 .fuel-presets button {

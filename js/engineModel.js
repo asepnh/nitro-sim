@@ -52,7 +52,7 @@ export class EngineModel {
 
     // Fuel nitro percentage the player can change between runs (engine
     // stopped). Reference is 20%, a common mid-strength RC fuel.
-    this.nitroPct = 20;
+    this.nitroPct = 16;
     this.refNitroPct = 20;
     this.fuelSensitivity = 0.3; // hours of needle shift per % nitro
 
