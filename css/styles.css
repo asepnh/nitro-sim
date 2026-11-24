@@ -110,15 +110,6 @@ h1, h2 { margin: 0; }
 .gauge canvas { width: 100%; max-width: 110px; height: auto; }
 .gauge-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
 .gauge-value { font-size: 1.1rem; font-weight: 600; }
-.unit-toggle {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--muted);
-  border-radius: 6px;
-  font-size: 0.65rem;
-  padding: 0.05rem 0.3rem;
-  margin-left: 0.3rem;
-}
 
 .smoke-gauge .smoke-visual {
   height: 60px;

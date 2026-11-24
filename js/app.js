@@ -4,7 +4,6 @@ import { EngineAudio } from "./audio.js";
 const model = new EngineModel();
 const audio = new EngineAudio();
 
-let tempUnit = "C";
 let selectedStep = { hsn: 1, lsn: 1, idle: 1 };
 
 // ---------- DOM refs ----------
@@ -14,7 +13,6 @@ const resetBtn = el("#resetBtn");
 const instructorMode = el("#instructorMode");
 const throttleSlider = el("#throttleSlider");
 const statusBanner = el("#statusBanner");
-const unitToggle = el("#unitToggle");
 const guideToggle = el("#guideToggle");
 const guidePanel = el("#guidePanel");
 
@@ -27,15 +25,10 @@ guideToggle.addEventListener("click", () => {
   guideToggle.setAttribute("aria-expanded", String(!open));
 });
 
-unitToggle.addEventListener("click", () => {
-  tempUnit = tempUnit === "F" ? "C" : "F";
-  unitToggle.textContent = `°${tempUnit}`;
-});
-
+// All temperatures are shown in Celsius; the model stores Fahrenheit
+// internally, so every display point converts through this helper.
 function fmtTemp(fahrenheit) {
-  return tempUnit === "F"
-    ? `${Math.round(fahrenheit)}°F`
-    : `${Math.round(((fahrenheit - 32) * 5) / 9)}°C`;
+  return `${Math.round(((fahrenheit - 32) * 5) / 9)}°C`;
 }
 
 // ---------- Throttle ----------
@@ -270,9 +263,7 @@ function frame(now) {
   drawDial(tempCanvas, tempFrac, tempColor);
   el("#tempValue").textContent = fmtTemp(model.tempF);
 
-  // Track conditions always read in Celsius, independent of the head-temp
-  // gauge's unit toggle.
-  el("#conditionTemp").textContent = `${Math.round(((model.ambientF - 32) * 5) / 9)}°C`;
+  el("#conditionTemp").textContent = fmtTemp(model.ambientF);
   el("#conditionHumidity").textContent = `${Math.round(model.humidityPct)}%`;
 
   smokePuff.style.height = `${10 + model.smoke * 0.5}%`;
