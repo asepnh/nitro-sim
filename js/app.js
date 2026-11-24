@@ -105,13 +105,12 @@ function applyNeedleMove(key, hours) {
 
   const card = document.querySelector(`.needle-card[data-needle="${key}"]`);
   const lastMove = card.querySelector("[data-last-move]");
-  const turns = Math.abs(hours) / 12;
   const dirLabel =
     key === "idle"
       ? hours > 0 ? "faster" : "slower"
       : hours > 0 ? "CCW (richer)" : "CW (leaner)";
-  const amountLabel =
-    turns >= 1 ? `${turns} turn${turns === 1 ? "" : "s"}` : `${Math.abs(hours)} hr`;
+  const hourLabels = { 0.25: "1/4 hr", 0.5: "1/2 hr", 1: "1 hr" };
+  const amountLabel = hourLabels[Math.abs(hours)] || `${Math.abs(hours)} hr`;
   lastMove.textContent = `Turned ${amountLabel} ${dirLabel}`;
 }
 
