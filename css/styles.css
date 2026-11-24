@@ -1,0 +1,276 @@
+:root {
+  --bg: #11151a;
+  --panel: #1a2028;
+  --panel-alt: #212935;
+  --text: #e8edf2;
+  --muted: #8d9aa8;
+  --accent: #ff7a30;
+  --rich: #3fa9f5;
+  --lean: #ff4d4f;
+  --good: #35c759;
+  --warn: #f5c542;
+  --border: #2b3542;
+  font-size: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  padding-bottom: 2rem;
+}
+
+h1, h2 { margin: 0; }
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.app-header h1 { font-size: 1.1rem; }
+
+.icon-btn {
+  background: var(--panel-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.guide-panel {
+  background: var(--panel);
+  margin: 0.75rem 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+.guide-panel.hidden { display: none; }
+.guide-panel li { margin-bottom: 0.5rem; }
+.guide-panel .hint { color: var(--muted); font-size: 0.85rem; }
+
+.layout {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.75rem 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gauges {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+.gauge {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.5rem;
+  text-align: center;
+}
+.gauge canvas { width: 100%; max-width: 110px; height: auto; }
+.gauge-label { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; }
+.gauge-value { font-size: 1.1rem; font-weight: 600; }
+.unit-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  font-size: 0.65rem;
+  padding: 0.05rem 0.3rem;
+  margin-left: 0.3rem;
+}
+
+.smoke-gauge .smoke-visual {
+  height: 60px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.smoke-puff {
+  width: 70%;
+  height: 10%;
+  background: #cfd8e3;
+  border-radius: 50% 50% 40% 40%;
+  opacity: 0.15;
+  filter: blur(4px);
+  transition: height 0.3s, opacity 0.3s;
+}
+
+.status-banner {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+.status-banner.hidden { display: none; }
+.status-banner.seized { background: #4a1414; color: #ff8a8a; border: 1px solid var(--lean); }
+.status-banner.fouled { background: #3a3414; color: #f5d97a; border: 1px solid var(--warn); }
+.status-banner.stalled { background: #22303c; color: var(--muted); border: 1px solid var(--border); }
+
+.engine-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+}
+.primary-btn, .secondary-btn {
+  flex: 1 1 auto;
+  min-height: 48px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+}
+.primary-btn {
+  background: var(--accent);
+  color: #1a1000;
+}
+.primary-btn.running {
+  background: var(--panel-alt);
+  color: var(--text);
+  border: 1px solid var(--lean);
+}
+.secondary-btn {
+  background: var(--panel-alt);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.instructor-toggle {
+  flex-basis: 100%;
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.throttle-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.throttle-section h2 { font-size: 0.95rem; margin-bottom: 0.6rem; }
+#throttleSlider {
+  width: 100%;
+  height: 40px;
+  accent-color: var(--accent);
+}
+.throttle-presets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+.throttle-presets button {
+  min-height: 42px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+.throttle-presets button.active {
+  background: var(--accent);
+  color: #1a1000;
+  border-color: var(--accent);
+}
+
+.needles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.needle-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.needle-card h2 { font-size: 1rem; }
+.needle-sub { margin: 0.15rem 0 0.7rem; color: var(--muted); font-size: 0.8rem; }
+.needle-row {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+}
+.clock-dial { flex: 0 0 auto; }
+.clock-dial canvas { width: 86px; height: 86px; }
+.needle-io { flex: 1 1 auto; min-width: 0; }
+.turn-readout { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.4rem; }
+.step-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+.step-selector button {
+  min-height: 36px;
+  font-size: 0.75rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--panel-alt);
+  color: var(--muted);
+}
+.step-selector button.active {
+  background: #33404f;
+  color: var(--text);
+  border-color: var(--accent);
+}
+.plus-minus {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+}
+.plus-minus button {
+  min-height: 50px;
+  border-radius: 9px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #10131a;
+}
+.minus-btn { background: var(--lean); color: #2a0000; }
+.plus-btn { background: var(--rich); color: #001b2a; }
+.last-move {
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-height: 1rem;
+}
+
+.tune-status {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+}
+.tune-status h2 { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.tune-status ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.tune-status li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.88rem; }
+.dot {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--muted);
+  flex: 0 0 auto;
+}
+.tune-status li.ok .dot { background: var(--good); }
+.tune-status li.bad .dot { background: var(--lean); }
+
+@media (min-width: 540px) {
+  .needle-row { align-items: center; }
+}

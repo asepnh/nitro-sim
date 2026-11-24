@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Nitro Tune Trainer</title>
+<meta name="description" content="Learn to tune an RC nitro engine's high-speed and low-speed needles by ear, smoke, and temperature." />
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Nitro Tune Trainer</h1>
+    <button id="guideToggle" class="icon-btn" aria-expanded="false">How to tune ▾</button>
+  </header>
+
+  <section id="guidePanel" class="guide-panel hidden">
+    <h2>How real nitro tuning works</h2>
+    <ol>
+      <li><strong>Warm the engine up</strong> at a moderate, steady throttle before judging anything.</li>
+      <li><strong>Set the High-Speed Needle (HSN) first.</strong> It meters fuel at mid/high RPM. Too rich: sluggish, blubbery, heavy wet smoke. Too lean: harsh "angry" scream, surging, overheating &mdash; dangerous if held under load.</li>
+      <li><strong>Then set the Low-Speed Needle (LSN).</strong> It meters fuel at idle/transition. Too rich: idle hangs high after you let off, eventually fouls the plug. Too lean: idle surges or stalls.</li>
+      <li><strong>Idle speed screw</strong> is purely mechanical &mdash; it just sets idle RPM, not the mixture.</li>
+      <li><strong>Always tune from the rich side down.</strong> Lean a little, test, repeat. Never start lean and richen &mdash; you risk a lean seizure before you notice.</li>
+      <li>A good tune: clean 2-stroke "ring-ding" scream at full throttle, a bit of 4-stroke burble at idle/off-throttle (normal), a thin wisp of smoke, stable idle, and temps holding in a safe band run after run.</li>
+    </ol>
+    <p class="hint">Adjustments are made in "clock hours" &mdash; 12 hours = one full turn of the needle. Counter-clockwise (CCW) richens, clockwise (CW) leans.</p>
+  </section>
+
+  <main class="layout">
+    <section class="gauges">
+      <div class="gauge" id="rpmGauge">
+        <canvas width="160" height="160"></canvas>
+        <div class="gauge-label">RPM</div>
+        <div class="gauge-value" id="rpmValue">0</div>
+      </div>
+      <div class="gauge" id="tempGauge">
+        <canvas width="160" height="160"></canvas>
+        <div class="gauge-label">
+          Head Temp
+          <button id="unitToggle" class="unit-toggle">°F</button>
+        </div>
+        <div class="gauge-value" id="tempValue">75°</div>
+      </div>
+      <div class="gauge smoke-gauge" id="smokeGauge">
+        <div class="smoke-visual"><div class="smoke-puff" id="smokePuff"></div></div>
+        <div class="gauge-label">Exhaust Smoke</div>
+        <div class="gauge-value" id="smokeValue">Clean</div>
+      </div>
+    </section>
+
+    <section id="statusBanner" class="status-banner hidden"></section>
+
+    <section class="engine-controls">
+      <button id="startStopBtn" class="primary-btn">Start Engine</button>
+      <button id="resetBtn" class="secondary-btn">Reset Engine</button>
+      <label class="instructor-toggle">
+        <input type="checkbox" id="instructorMode" />
+        Instructor mode (reveal true mixture)
+      </label>
+    </section>
+
+    <section class="throttle-section">
+      <h2>Throttle</h2>
+      <input type="range" id="throttleSlider" min="0" max="100" value="0" />
+      <div class="throttle-presets">
+        <button data-throttle="0">Idle</button>
+        <button data-throttle="25">1/4</button>
+        <button data-throttle="50">1/2</button>
+        <button data-throttle="75">3/4</button>
+        <button data-throttle="100">Full</button>
+      </div>
+    </section>
+
+    <section class="needles">
+      <article class="needle-card" data-needle="hsn">
+        <h2>High-Speed Needle</h2>
+        <p class="needle-sub">Meters fuel at mid/high RPM</p>
+        <div class="needle-row">
+          <div class="clock-dial"><canvas width="110" height="110"></canvas></div>
+          <div class="needle-io">
+            <div class="turn-readout" data-readout>0 turns</div>
+            <div class="step-selector" data-step-selector>
+              <button data-step="1" class="active">1 hr</button>
+              <button data-step="3">1/4</button>
+              <button data-step="6">1/2</button>
+              <button data-step="12">Full</button>
+            </div>
+            <div class="plus-minus">
+              <button class="minus-btn" data-dir="lean" aria-label="Turn clockwise (lean)">&minus; Lean (CW)</button>
+              <button class="plus-btn" data-dir="rich" aria-label="Turn counter-clockwise (rich)">+ Rich (CCW)</button>
+            </div>
+            <div class="last-move" data-last-move>&nbsp;</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="needle-card" data-needle="lsn">
+        <h2>Low-Speed Needle</h2>
+        <p class="needle-sub">Meters fuel at idle &amp; transition</p>
+        <div class="needle-row">
+          <div class="clock-dial"><canvas width="110" height="110"></canvas></div>
+          <div class="needle-io">
+            <div class="turn-readout" data-readout>0 turns</div>
+            <div class="step-selector" data-step-selector>
+              <button data-step="1" class="active">1 hr</button>
+              <button data-step="3">1/4</button>
+              <button data-step="6">1/2</button>
+              <button data-step="12">Full</button>
+            </div>
+            <div class="plus-minus">
+              <button class="minus-btn" data-dir="lean" aria-label="Turn clockwise (lean)">&minus; Lean (CW)</button>
+              <button class="plus-btn" data-dir="rich" aria-label="Turn counter-clockwise (rich)">+ Rich (CCW)</button>
+            </div>
+            <div class="last-move" data-last-move>&nbsp;</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="needle-card" data-needle="idle">
+        <h2>Idle Speed Screw</h2>
+        <p class="needle-sub">Mechanical stop &mdash; sets idle RPM only</p>
+        <div class="needle-row">
+          <div class="clock-dial"><canvas width="110" height="110"></canvas></div>
+          <div class="needle-io">
+            <div class="turn-readout" data-readout>Mid</div>
+            <div class="step-selector" data-step-selector>
+              <button data-step="1" class="active">1 hr</button>
+              <button data-step="3">1/4</button>
+              <button data-step="6">1/2</button>
+              <button data-step="12">Full</button>
+            </div>
+            <div class="plus-minus">
+              <button class="minus-btn" data-dir="lean" aria-label="Lower idle speed">&minus; Slower</button>
+              <button class="plus-btn" data-dir="rich" aria-label="Raise idle speed">+ Faster</button>
+            </div>
+            <div class="last-move" data-last-move>&nbsp;</div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="tune-status">
+      <h2>Tune Checklist</h2>
+      <ul>
+        <li id="status-idle"><span class="dot"></span> Idle holds steady, no stalling</li>
+        <li id="status-transition"><span class="dot"></span> Crisp throttle transition, no bog</li>
+        <li id="status-temp"><span class="dot"></span> Top-end temps stay in a safe range</li>
+        <li id="status-power"><span class="dot"></span> Clean top-end power &amp; sound</li>
+      </ul>
+    </section>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
