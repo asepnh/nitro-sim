@@ -246,10 +246,10 @@ export class EngineAudio {
       return;
     }
 
-    // Firing frequency: once per revolution, pitched up ~30% from the
+    // Firing frequency: once per revolution, pitched up ~62% from the
     // literal firing rate for a brighter, less bassy note. RPM 2200 ->
-    // ~48Hz idle putter, RPM 32000 -> ~693Hz full-throttle whine.
-    const freq = (rpm / 60) * 1.3;
+    // ~59Hz idle putter, RPM 32000 -> ~866Hz full-throttle whine.
+    const freq = (rpm / 60) * 1.625;
     const leanness = Math.max(0, -mixDev);
     const richness = Math.max(0, mixDev);
 
