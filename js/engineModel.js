@@ -252,7 +252,7 @@ export class EngineModel {
     }
 
     // Approach target RPM with inertia (engines don't snap instantly).
-    const rpmRate = this.rpm < this.targetRpm ? 14060 : 10940;
+    const rpmRate = this.rpm < this.targetRpm ? 21090 : 16410;
     const maxStep = rpmRate * dt;
     const delta = this.targetRpm - this.rpm;
     this.rpm += Math.max(-maxStep, Math.min(maxStep, delta));
